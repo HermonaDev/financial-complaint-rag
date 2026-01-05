@@ -3,20 +3,23 @@
 A Retrieval-Augmented Generation system for analyzing customer complaints in financial services.
 
 ## Project Structure
+<pre>
 financial-complaint-rag/
-├── .github/workflows/      # CI/CD pipelines
-├── config/                 # Configuration files
-├── data/                   # Data files (gitignored)
-├── docs/                   # Documentation
-├── notebooks/              # Jupyter notebooks for EDA
-├── src/                    # Source code
+├── .github/workflows/
+├── config/
+├── data/
+├── docs/
+├── notebooks/
+├── src/
 │   ├── data_preprocessing/
 │   ├── embedding/
 │   ├── retrieval/
 │   ├── generation/
 │   └── evaluation/
-├── tests/                  # Test suite
-└── app/                    # Web application
+├── tests/
+└── app/
+</pre>
+
 
 ## Setup
 
