@@ -1,0 +1,27 @@
+data:
+  raw_path: "data/raw"
+  processed_path: "data/processed"
+  sample_size: 10000
+  products:
+    - "Credit card"
+    - "Personal loan"
+    - "Savings account"
+    - "Money transfers"
+
+embedding:
+  model_name: "sentence-transformers/all-MiniLM-L6-v2"
+  chunk_size: 500
+  chunk_overlap: 50
+
+retrieval:
+  top_k: 5
+  similarity_threshold: 0.7
+
+generation:
+  model_name: "mistralai/Mistral-7B-Instruct-v0.1"
+  temperature: 0.1
+  max_tokens: 500
+
+ui:
+  framework: "gradio"  # or "streamlit"
+  theme: "soft"
