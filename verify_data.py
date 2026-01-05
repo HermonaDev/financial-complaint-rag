@@ -9,16 +9,16 @@ sys.path.append(str(Path(__file__).parent / "src"))
 
 try:
     from data_preprocessing import DataLoader
-    
+
     print("Testing data loading...")
-    
+
     loader = DataLoader()
-    
+
     # Try to load complaints
     print("1. Loading complaints.csv...")
     complaints = loader.load_raw_complaints()
-    print(f"   ✓ Loaded {len(complaints)} complaints")
-    print(f"   Columns: {list(complaints.columns)}")
+    print("   ✓ Loaded {} complaints".format(len(complaints)))
+    print("   Columns: {}".format(list(complaints.columns)))
     
     # Try to load embeddings if they exist
     if (Path(loader.raw_data_path) / "complaint_embeddings.parquet").exists():

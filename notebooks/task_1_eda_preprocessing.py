@@ -6,11 +6,13 @@ Main script for exploratory data analysis and data cleaning.
 
 import sys
 from pathlib import Path
+
+# Add src to path before importing local package
+sys.path.append(str(Path(__file__).parent.parent / "src"))
+
 import logging
 import json
-
-# Add src to path
-sys.path.append(str(Path(__file__).parent.parent / "src"))
+import pandas as pd
 
 from data_preprocessing import DataLoader, DataCleaner, DataAnalyzer
 
@@ -25,6 +27,96 @@ logging.basicConfig(
 )
 
 logger = logging.getLogger(__name__)
+
+
+def generate_eda_report(df: pd.DataFrame, summary: dict, output_path: Path):
+    """Generate a textual EDA report.
+    
+    Args:
+        df: Processed DataFrame
+        summary: EDA summary dictionary
+        output_path: Path to saved processed data
+    """
+    report_lines = []
+    
+    report_lines.append("=" * 80)
+    report_lines.append("EDA AND DATA PREPROCESSING REPORT")
+    report_lines.append("=" * 80)
+    report_lines.append("")
+    
+    # Dataset Overview
+    report_lines.append("1. DATASET OVERVIEW")
+    report_lines.append("-" * 40)
+    report_lines.append(f"Total records after processing: {len(df):,}")
+    report_lines.append(f"Total columns: {len(df.columns)}")
+    report_lines.append("")
+    
+    # Product Distribution
+    report_lines.append("2. PRODUCT DISTRIBUTION")
+    report_lines.append("-" * 40)
+    product_counts = summary.get('product_distribution', {}).get('counts', {})
+    for product, count in product_counts.items():
+        percentage = (count / len(df)) * 100
+        report_lines.append(f"{product}: {count:,} complaints ({percentage:.1f}%)")
+    report_lines.append("")
+    
+    # Narrative Analysis
+    report_lines.append("3. NARRATIVE ANALYSIS")
+    report_lines.append("-" * 40)
+    nar_stats = summary.get('narrative_analysis', {})
+    report_lines.append(f"Mean narrative length: {nar_stats.get('mean', 0):.0f} characters")
+    report_lines.append(f"Median narrative length: {nar_stats.get('median', 0):.0f} characters")
+    report_lines.append(
+        f"Shortest narrative: {nar_stats.get('min', 0):,} characters"
+    )
+    report_lines.append(
+        f"Longest narrative: {nar_stats.get('max', 0):,} characters"
+    )
+    short_thresh = nar_stats.get('short_threshold', 0)
+    short_count = nar_stats.get('very_short_count', 0)
+    long_thresh = nar_stats.get('long_threshold', 0)
+    long_count = nar_stats.get('very_long_count', 0)
+    report_lines.append(
+        f"Very short narratives (< {short_thresh:.0f} chars): {short_count:,}"
+    )
+    report_lines.append(
+        f"Very long narratives (> {long_thresh:.0f} chars): {long_count:,}"
+    )
+    report_lines.append("")
+    
+    # Data Quality
+    report_lines.append("4. DATA QUALITY")
+    report_lines.append("-" * 40)
+    missing = summary.get('missing_values', {})
+    for col, count in missing.items():
+        if count > 0:
+            percentage = (count / len(df)) * 100
+            report_lines.append(f"{col}: {count:,} missing values ({percentage:.1f}%)")
+    
+    if all(v == 0 for v in missing.values()):
+        report_lines.append("No missing values in key columns")
+    report_lines.append("")
+    
+    # Output Information
+    report_lines.append("5. OUTPUT FILES")
+    report_lines.append("-" * 40)
+    report_lines.append(f"Processed data: {output_path}")
+    report_lines.append("EDA plots saved to: notebooks/eda_output/")
+    report_lines.append("")
+    
+    report_lines.append("=" * 80)
+    report_lines.append("END OF REPORT")
+    report_lines.append("=" * 80)
+    
+    # Save report
+    report_path = output_path.parent / "eda_report.txt"
+    with open(report_path, 'w') as f:
+        f.write("\n".join(report_lines))
+    
+    logger.info(f"EDA report saved to {report_path}")
+    
+    # Also print to console
+    print("\n".join(report_lines))
 
 
 def main():
@@ -109,84 +201,5 @@ def main():
         sys.exit(1)
 
 
-def generate_eda_report(df: pd.DataFrame, summary: dict, output_path: Path):
-    """Generate a textual EDA report.
-    
-    Args:
-        df: Processed DataFrame
-        summary: EDA summary dictionary
-        output_path: Path to saved processed data
-    """
-    report_lines = []
-    
-    report_lines.append("=" * 80)
-    report_lines.append("EDA AND DATA PREPROCESSING REPORT")
-    report_lines.append("=" * 80)
-    report_lines.append("")
-    
-    # Dataset Overview
-    report_lines.append("1. DATASET OVERVIEW")
-    report_lines.append("-" * 40)
-    report_lines.append(f"Total records after processing: {len(df):,}")
-    report_lines.append(f"Total columns: {len(df.columns)}")
-    report_lines.append("")
-    
-    # Product Distribution
-    report_lines.append("2. PRODUCT DISTRIBUTION")
-    report_lines.append("-" * 40)
-    product_counts = summary.get('product_distribution', {}).get('counts', {})
-    for product, count in product_counts.items():
-        percentage = (count / len(df)) * 100
-        report_lines.append(f"{product}: {count:,} complaints ({percentage:.1f}%)")
-    report_lines.append("")
-    
-    # Narrative Analysis
-    report_lines.append("3. NARRATIVE ANALYSIS")
-    report_lines.append("-" * 40)
-    nar_stats = summary.get('narrative_analysis', {})
-    report_lines.append(f"Mean narrative length: {nar_stats.get('mean', 0):.0f} characters")
-    report_lines.append(f"Median narrative length: {nar_stats.get('median', 0):.0f} characters")
-    report_lines.append(f"Shortest narrative: {nar_stats.get('min', 0):,} characters")
-    report_lines.append(f"Longest narrative: {nar_stats.get('max', 0):,} characters")
-    report_lines.append(f"Very short narratives (< {nar_stats.get('short_threshold', 0):.0f} chars): {nar_stats.get('very_short_count', 0):,}")
-    report_lines.append(f"Very long narratives (> {nar_stats.get('long_threshold', 0):.0f} chars): {nar_stats.get('very_long_count', 0):,}")
-    report_lines.append("")
-    
-    # Data Quality
-    report_lines.append("4. DATA QUALITY")
-    report_lines.append("-" * 40)
-    missing = summary.get('missing_values', {})
-    for col, count in missing.items():
-        if count > 0:
-            percentage = (count / len(df)) * 100
-            report_lines.append(f"{col}: {count:,} missing values ({percentage:.1f}%)")
-    
-    if all(v == 0 for v in missing.values()):
-        report_lines.append("No missing values in key columns")
-    report_lines.append("")
-    
-    # Output Information
-    report_lines.append("5. OUTPUT FILES")
-    report_lines.append("-" * 40)
-    report_lines.append(f"Processed data: {output_path}")
-    report_lines.append("EDA plots saved to: notebooks/eda_output/")
-    report_lines.append("")
-    
-    report_lines.append("=" * 80)
-    report_lines.append("END OF REPORT")
-    report_lines.append("=" * 80)
-    
-    # Save report
-    report_path = output_path.parent / "eda_report.txt"
-    with open(report_path, 'w') as f:
-        f.write("\n".join(report_lines))
-    
-    logger.info(f"EDA report saved to {report_path}")
-    
-    # Also print to console
-    print("\n".join(report_lines))
-
-
 if __name__ == "__main__":
-    import pandas as pd
     main()
