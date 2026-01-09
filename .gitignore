@@ -14,10 +14,10 @@ env/
 .venv/
 
 # IDE
-.vscode/
 .idea/
 *.swp
 *.swo
+# Note: .vscode/settings.json is intentionally committed for shared workspace settings
 
 # Python
 __pycache__/
@@ -43,6 +43,7 @@ wheels/
 
 # Logs
 *.log
+logs/
 
 # OS
 .DS_Store
