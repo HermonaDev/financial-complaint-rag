@@ -16,3 +16,5 @@ pytest>=7.4.0
 black>=23.0.0
 flake8>=6.0.0
 mypy>=1.0.0
+# Types for third-party packages used by mypy
+types-PyYAML>=6.0.0

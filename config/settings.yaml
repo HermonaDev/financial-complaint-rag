@@ -7,6 +7,7 @@ data:
     - "Personal loan"
     - "Savings account"
     - "Money transfers"
+    - "Money transfer"
 
 embedding:
   model_name: "sentence-transformers/all-MiniLM-L6-v2"
@@ -23,5 +24,10 @@ generation:
   max_tokens: 500
 
 ui:
-  framework: "gradio"  # or "streamlit"
+  framework: "gradio"
   theme: "soft"
+
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file: "task_1_processing.log"
