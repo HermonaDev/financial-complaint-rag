@@ -1,0 +1,21 @@
+# Core requirements for Task 2
+pandas>=2.0.0
+numpy>=1.24.0
+scikit-learn>=1.3.0
+faiss-cpu>=1.7.0
+chromadb>=0.4.0
+tqdm>=4.65.0
+
+# Lightweight NLP (avoid heavy transformers/torch if possible)
+# Try to install these but they're optional
+huggingface-hub>=0.19.0
+tokenizers>=0.15.0
+
+# For compatibility, we'll use a simpler approach first
+# transformers>=4.35.0  # Optional - only if torch works
+# sentence-transformers>=2.2.0  # Optional - only if torch works
+# torch>=2.0.0  # Optional - Windows compatibility issues
+
+# Utils
+python-dotenv>=1.0.0
+pyarrow>=14.0.0  # For parquet support
