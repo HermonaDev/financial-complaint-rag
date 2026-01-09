@@ -4,10 +4,22 @@
 import pandas as pd
 from pathlib import Path
 import json
+import numpy as np
 
 print("="*60)
 print("Running Simplified Task 1")
 print("="*60)
+
+# Custom JSON encoder for NumPy types
+class NumpyEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, np.integer):
+            return int(obj)
+        elif isinstance(obj, np.floating):
+            return float(obj)
+        elif isinstance(obj, np.ndarray):
+            return obj.tolist()
+        return super().default(obj)
 
 # Load and filter data
 print("\n1. Loading data...")
@@ -42,13 +54,13 @@ filtered['cleaned_narrative'] = filtered['Consumer complaint narrative'].apply(c
 # Basic EDA
 print("\n5. Generating EDA summary...")
 summary = {
-    'total_records': len(filtered),
-    'product_distribution': filtered['Product'].value_counts().to_dict(),
+    'total_records': int(len(filtered)),
+    'product_distribution': {k: int(v) for k, v in filtered['Product'].value_counts().to_dict().items()},
     'narrative_stats': {
-        'mean_length': filtered['cleaned_narrative'].str.len().mean(),
-        'median_length': filtered['cleaned_narrative'].str.len().median(),
-        'min_length': filtered['cleaned_narrative'].str.len().min(),
-        'max_length': filtered['cleaned_narrative'].str.len().max(),
+        'mean_length': float(filtered['cleaned_narrative'].str.len().mean()),
+        'median_length': float(filtered['cleaned_narrative'].str.len().median()),
+        'min_length': int(filtered['cleaned_narrative'].str.len().min()),
+        'max_length': int(filtered['cleaned_narrative'].str.len().max()),
     }
 }
 
@@ -66,7 +78,7 @@ print(f"   File size: {output_path.stat().st_size / 1024**2:.1f} MB")
 # Save summary
 summary_path = output_dir / 'task1_summary.json'
 with open(summary_path, 'w') as f:
-    json.dump(summary, f, indent=2)
+    json.dump(summary, f, indent=2, cls=NumpyEncoder)
 print(f"   Saved summary to: {summary_path}")
 
 # Print summary
